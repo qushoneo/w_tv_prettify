@@ -41,6 +41,10 @@ function createEmoteRegex(emoteName) {
     return new RegExp(`(?<!\\S)${escaped}(?!\\S)`, 'g');
   }
 
+  if (emoteName.includes(':')) {
+    return new RegExp(`(?<!\\S)${escaped}(?!\\S)`, 'g');
+  }
+
   return new RegExp(`\\b${escaped}\\b`, 'g');
 }
 
@@ -112,7 +116,7 @@ function replaceEmotes(root = document.body) {
       const img = document.createElement('img');
       img.src = m.emoteUrl;
       img.alt = m.emoteName;
-      img.style.height = '20px';
+      img.style.height = '30px';
       img.style.verticalAlign = 'middle';
       img.style.margin = '0 2px';
       img.style.display = 'inline';
@@ -231,7 +235,7 @@ function setupEmoteAutocomplete() {
       `;
 
       item.innerHTML = `
-        <img src="${emote.url}" alt="${emote.name}" style="width: 20px; height: 20px;">
+        <img src="${emote.url}" alt="${emote.name}" style="width: 30px; height: 30px;">
         <span>${emote.name}</span>
       `;
 
@@ -282,7 +286,8 @@ function setupEmoteAutocomplete() {
     const cursorPos = chatInput.selectionStart;
 
     let wordStart = cursorPos;
-    while (wordStart > 0 && /[a-zA-Z0-9]/.test(value[wordStart - 1])) {
+    // Look for word start, including colons for emotes like :3
+    while (wordStart > 0 && /[a-zA-Z0-9:]/.test(value[wordStart - 1])) {
       wordStart--;
     }
 
@@ -307,7 +312,8 @@ function setupEmoteAutocomplete() {
     const cursorPos = chatInput.selectionStart;
 
     let wordStart = cursorPos;
-    while (wordStart > 0 && /[a-zA-Z0-9]/.test(value[wordStart - 1])) {
+    // Look for word start, including colons for emotes like :3
+    while (wordStart > 0 && /[a-zA-Z0-9:]/.test(value[wordStart - 1])) {
       wordStart--;
     }
 
