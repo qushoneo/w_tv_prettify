@@ -1,17 +1,13 @@
-// Twitch Emoticons Library
 class TwitchEmoticons {
   constructor() {
     this.emotes = {};
     this.channel = null;
   }
 
-  // Загрузка эмодзи для канала
   async loadChannelEmotes(channelName) {
     this.channel = channelName;
-    console.log('Загружаем эмодзи для канала:', channelName);
 
     try {
-      // Загружаем данные с API
       const response = await fetch(
         `https://api.twitchemotes.com/api/v4/channels/${channelName}`,
         {
@@ -29,7 +25,6 @@ class TwitchEmoticons {
 
       const data = await response.json();
 
-      // Обрабатываем обычные Twitch эмодзи
       if (data.emotes) {
         data.emotes.forEach((emote) => {
           this.emotes[emote.code] = {
@@ -40,7 +35,6 @@ class TwitchEmoticons {
         });
       }
 
-      // Обрабатываем BTTV эмодзи
       if (data.bttv_emotes) {
         data.bttv_emotes.forEach((emote) => {
           this.emotes[emote.code] = {
@@ -51,7 +45,6 @@ class TwitchEmoticons {
         });
       }
 
-      // Обрабатываем FFZ эмодзи
       if (data.ffz_emotes) {
         data.ffz_emotes.forEach((emote) => {
           this.emotes[emote.code] = {
@@ -62,15 +55,13 @@ class TwitchEmoticons {
         });
       }
 
-      console.log(`Загружено эмодзи: ${Object.keys(this.emotes).length}`);
       return this.emotes;
     } catch (error) {
-      console.error('Ошибка при загрузке эмодзи:', error);
+      console.error('Error loading emotes:', error);
       return {};
     }
   }
 
-  // Загрузка глобальных эмодзи
   async loadGlobalEmotes() {
     try {
       const response = await fetch(
@@ -98,33 +89,25 @@ class TwitchEmoticons {
         };
       });
 
-      console.log(
-        `Загружено глобальных эмодзи: ${Object.keys(this.emotes).length}`
-      );
       return this.emotes;
     } catch (error) {
-      console.error('Ошибка при загрузке глобальных эмодзи:', error);
+      console.error('Error loading global emotes:', error);
       return {};
     }
   }
 
-  // Получение всех эмодзи
   getAllEmotes() {
     return this.emotes;
   }
 
-  // Получение URL эмодзи по названию
   getEmoteUrl(emoteName) {
-    console.log(emoteName);
     return this.emotes[emoteName]?.url || null;
   }
 
-  // Проверка существования эмодзи
   hasEmote(emoteName) {
     return emoteName in this.emotes;
   }
 
-  // Замена текста на эмодзи
   replaceEmotes(text) {
     let result = text;
 
@@ -139,7 +122,6 @@ class TwitchEmoticons {
     return result;
   }
 
-  // Загрузка всех эмодзи (канал + глобальные)
   async loadAllEmotes(channelName) {
     await Promise.all([
       this.loadChannelEmotes(channelName),
@@ -150,5 +132,4 @@ class TwitchEmoticons {
   }
 }
 
-// Экспортируем для использования
 window.TwitchEmoticons = TwitchEmoticons;
