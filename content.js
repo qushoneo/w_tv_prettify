@@ -27,6 +27,14 @@ async function loadEmotesFromAPI() {
 
     emotes = { ...emotes, ...parsed };
     console.log('Загружено смайликов:', Object.keys(parsed).length);
+
+    // Отладочная информация - показываем все эмодзи, содержащие 'xd' (в любом регистре)
+    const xdEmotes = Object.keys(parsed).filter((name) =>
+      name.toLowerCase().includes('xd')
+    );
+    if (xdEmotes.length > 0) {
+      console.log('Эмодзи с "xd":', xdEmotes);
+    }
   } catch (err) {
     console.error('Ошибка при загрузке эмотов:', err);
   }
@@ -40,11 +48,11 @@ function createEmoteRegex(emoteName) {
   if (/^[()]+$/.test(emoteName)) {
     // Для скобок используем позитивный lookbehind и lookahead
     // чтобы убедиться, что это отдельный смайлик, а не часть слова
-    return new RegExp(`(?<!\\S)${escaped}(?!\\S)`, 'gi');
+    return new RegExp(`(?<!\\S)${escaped}(?!\\S)`, 'g'); // Убираем флаг 'i'
   }
 
   // Для обычных смайликов используем границы слов
-  return new RegExp(`\\b${escaped}\\b`, 'gi');
+  return new RegExp(`\\b${escaped}\\b`, 'g'); // Убираем флаг 'i' для чувствительности к регистру
 }
 
 // Замена текста на смайлы, чтобы картинки вставлялись в ту же строку, если влазят
@@ -97,7 +105,7 @@ function replaceEmotes(root = document.body) {
         matches.push({
           index: match.index,
           length: match[0].length,
-          emoteName,
+          emoteName: match[0], // Сохраняем фактически найденный текст
           emoteUrl,
         });
       }
@@ -125,7 +133,7 @@ function replaceEmotes(root = document.body) {
       // Создаём img для эмота
       const img = document.createElement('img');
       img.src = m.emoteUrl;
-      img.alt = m.emoteName;
+      img.alt = m.emoteName; // Теперь это фактически найденный текст
       img.style.height = '20px';
       img.style.verticalAlign = 'middle';
       img.style.margin = '0 2px';
