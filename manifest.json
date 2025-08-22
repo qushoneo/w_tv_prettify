@@ -2,7 +2,10 @@
   "manifest_version": 3,
   "name": "7TV Smiles",
   "version": "1.0.0",
-  "description": "Заменяет слова на смайлики 7.tv",
+  "description": "Fan-made extension that replaces text with 7TV emotes",
+  "icons": {
+    "128": "icon.png"
+  },
   "permissions": ["activeTab"],
   "host_permissions": [
     "https://api.twitchemotes.com/*",

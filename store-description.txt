@@ -1,0 +1,19 @@
+7TV Smiles - Fan-Made Emote Extension
+
+Transform your chat experience with 7TV emotes! This fan-made extension automatically replaces text with beautiful 7TV emotes on w.tv and other supported platforms.
+
+Features:
+✨ Automatic emote replacement in chat
+🎯 Smart autocomplete with Tab key
+🎨 Beautiful emote previews
+⚡ Fast and lightweight
+🔄 Real-time emote loading from 7TV API
+
+How to use:
+1. Type emote names like "XD", ":3", or "kappa"
+2. Use Tab key for quick emote selection
+3. Emotes automatically appear in chat messages
+
+Perfect for streamers and chat enthusiasts who want to enhance their communication with expressive 7TV emotes!
+
+Keywords: emotes, 7tv, chat, twitch, streaming, emoji, smileys
