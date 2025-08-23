@@ -5,20 +5,6 @@ const API_URL = `https://7tv.io/v3/emote-sets/${SET_ID}`;
 
 let emotes = {};
 
-// Firebase configuration - замените на ваши данные
-const firebaseConfig = {
-  apiKey: 'AIzaSyDm1xFUlI6i1FLTdwguRtqyomMyg2cIcuo',
-  authDomain: 'wtvemojis.firebaseapp.com',
-  databaseURL:
-    'https://wtvemojis-default-rtdb.europe-west1.firebasedatabase.app',
-  projectId: 'wtvemojis',
-  storageBucket: 'wtvemojis.firebasestorage.app',
-  messagingSenderId: '324786416725',
-  appId: '1:324786416725:web:ff564065c92d37e86338dc',
-  measurementId: 'G-0KMRSRQJTX',
-};
-
-// Initialize Firebase
 let db = null;
 let app = null;
 
@@ -27,13 +13,11 @@ async function initializeFirebase() {
     console.log('Starting Firebase initialization...');
     console.log('Firebase config:', firebaseConfig);
 
-    // Проверяем, не загружен ли уже Firebase
     if (typeof firebase !== 'undefined') {
       console.log('Firebase already loaded');
     } else {
       console.log('Firebase not loaded, loading scripts...');
 
-      // Загружаем Firebase SDK через обычные скрипты
       const firebaseScript = document.createElement('script');
       firebaseScript.src =
         'https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js';
@@ -69,7 +53,6 @@ async function initializeFirebase() {
       });
     }
 
-    // Проверяем, что Firebase доступен
     if (typeof firebase === 'undefined') {
       throw new Error('Firebase is not available after loading scripts');
     }
@@ -77,7 +60,6 @@ async function initializeFirebase() {
     console.log('Firebase object available:', firebase);
     console.log('Initializing Firebase app...');
 
-    // Инициализируем Firebase
     app = firebase.initializeApp(firebaseConfig);
     console.log('Firebase app initialized:', app);
 
@@ -87,12 +69,11 @@ async function initializeFirebase() {
 
     console.log('Firebase initialized successfully');
 
-    // Тестируем подключение
     try {
       const testRef = db.ref('test');
       await testRef.set({ timestamp: Date.now() });
       console.log('Firebase connection test successful');
-      await testRef.remove(); // Удаляем тестовые данные
+      await testRef.remove();
     } catch (testError) {
       console.error('Firebase connection test failed:', testError);
     }
@@ -131,7 +112,7 @@ async function sendInstallStats() {
         console.log(
           `Username not found, retrying... (${attempts}/${maxAttempts})`
         );
-        await new Promise((resolve) => setTimeout(resolve, 1000)); // Ждем 1 секунду
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       }
     }
 
@@ -146,7 +127,6 @@ async function sendInstallStats() {
     };
     console.log('Stats object created:', stats);
 
-    // Send to Firebase via REST API
     const response = await fetch(`${firebaseConfig.databaseURL}/stats.json`, {
       method: 'POST',
       headers: {
@@ -216,7 +196,6 @@ function replaceEmotes(root = document.body) {
 
   let node;
   while ((node = walker.nextNode())) {
-    // Skip if parent already contains img tags (avoid duplicates)
     if (
       node.parentNode &&
       (node.parentNode.tagName === 'SCRIPT' ||
@@ -311,6 +290,18 @@ const observer = new MutationObserver((muts) => {
     });
   });
 });
+
+var firebaseConfig = {
+  apiKey: 'AIzaSyDm1xFUlI6i1FLTdwguRtqyomMyg2cIcuo',
+  authDomain: 'wtvemojis.firebaseapp.com',
+  databaseURL:
+    'https://wtvemojis-default-rtdb.europe-west1.firebasedatabase.app',
+  projectId: 'wtvemojis',
+  storageBucket: 'wtvemojis.firebasestorage.app',
+  messagingSenderId: '324786416725',
+  appId: '1:324786416725:web:ff564065c92d37e86338dc',
+  measurementId: 'G-0KMRSRQJTX',
+};
 
 function setupEmoteAutocomplete() {
   const chatInput = document.querySelector(
@@ -642,7 +633,6 @@ function createCustomFullscreenButton() {
       );
     }
 
-    // Ищем элемент с ником пользователя
     if (!usernameElement) {
       usernameElement = document.querySelector(
         '.font-medium.text-sm.text-\\[var\\(--color-base-foreground-primary\\)\\].truncate'
@@ -678,7 +668,7 @@ function createCustomFullscreenButton() {
         if (chatElement) {
           chatElement.style.top = '';
         }
-        // Восстанавливаем CSS переменную
+
         document.documentElement.style.setProperty('--chat-width', '');
         button.textContent = 'Врубить мадарыча поменьше';
         button.style.top = '20px';
@@ -707,7 +697,7 @@ function createCustomFullscreenButton() {
         if (chatElement) {
           chatElement.style.top = '0';
         }
-        // Устанавливаем минимальную ширину через CSS переменную
+
         document.documentElement.style.setProperty('--chat-width', '280px');
         button.style.right = '20px';
         button.textContent = 'Врубить мадарыча поменьше';
@@ -732,6 +722,5 @@ loadEmotesFromAPI().then(() => {
 
   createCustomFullscreenButton();
 
-  // Отправляем статистику
   sendInstallStats();
 });
