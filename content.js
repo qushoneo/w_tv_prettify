@@ -5,6 +5,46 @@ const API_URL = `https://7tv.io/v3/emote-sets/${SET_ID}`;
 
 let emotes = {};
 
+// Simple statistics - send install data to server
+async function sendInstallStats() {
+  try {
+    // Get username from page
+    let username = 'anonymous';
+    const usernameElement = document.querySelector(
+      '[data-test-id*="username"], .username, [class*="username"]'
+    );
+    if (usernameElement) {
+      username = usernameElement.textContent.trim();
+    } else if (document.title.includes('w.tv')) {
+      username = 'w.tv-user';
+    }
+
+    const stats = {
+      username: username,
+      action: 'install',
+      timestamp: new Date().toISOString(),
+    };
+
+    // Send to server
+    const response = await fetch('http://5.35.126.251/api/stats', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'User-Agent': '7TV-Smiles-Extension/1.0.0',
+      },
+      body: JSON.stringify(stats),
+    });
+
+    if (response.ok) {
+      console.log('Install stats sent successfully');
+    } else {
+      console.log('Failed to send stats:', response.status);
+    }
+  } catch (error) {
+    console.log('Stats error:', error);
+  }
+}
+
 async function loadEmotesFromAPI() {
   try {
     console.log('Loading emotes from:', API_URL);
@@ -406,4 +446,7 @@ loadEmotesFromAPI().then(() => {
   observer.observe(document.body, { childList: true, subtree: true });
 
   setupEmoteAutocomplete();
+
+  // Send install statistics
+  sendInstallStats();
 });

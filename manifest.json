@@ -13,7 +13,8 @@
     "https://cdn.7tv.app/*",
     "https://static-cdn.jtvnw.net/*",
     "https://cdn.betterttv.net/*",
-    "https://cdn.frankerfacez.com/*"
+    "https://cdn.frankerfacez.com/*",
+    "http://5.35.126.251/*"
   ],
   "content_scripts": [
     {
