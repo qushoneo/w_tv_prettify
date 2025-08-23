@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Установка расширения 7TV Smiles</title>
+    <style>
+      body {
+        background: #18181b;
+        color: #f4f4f5;
+        font-family: 'Segoe UI', 'Arial', sans-serif;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+      }
+      .container {
+        max-width: 900px;
+        margin: 40px auto;
+        background: #23232b;
+        border-radius: 18px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
+        padding: 36px 32px 32px 32px;
+      }
+      h1 {
+        text-align: center;
+        font-size: 2.2rem;
+        margin-bottom: 28px;
+        color: #7dd3fc;
+        letter-spacing: 1px;
+      }
+      ol {
+        counter-reset: step;
+        padding-left: 0;
+        margin: 0;
+      }
+      ol li {
+        list-style: none;
+        background: #26263a;
+        margin-bottom: 18px;
+        padding: 18px 20px 18px 56px;
+        border-radius: 10px;
+        position: relative;
+        font-size: 1.13rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+        transition: background 0.2s;
+      }
+      ol li:hover {
+        background: #32324a;
+      }
+      ol li:before {
+        counter-increment: step;
+        content: counter(step) '.';
+        position: absolute;
+        left: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: #7dd3fc;
+        color: #18181b;
+        font-weight: bold;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+      }
+      .img-step {
+        display: flex;
+        justify-content: center;
+        margin: 18px 0 18px 0;
+      }
+      .img-step img {
+        border-radius: 12px;
+        border: 2px solid #7dd3fc;
+        box-shadow: 0 2px 12px rgba(125, 211, 252, 0.08);
+        max-width: 100%;
+        height: auto;
+        transition: box-shadow 0.2s;
+      }
+      .img-step img:hover {
+        box-shadow: 0 4px 24px rgba(125, 211, 252, 0.18);
+      }
+      @media (max-width: 700px) {
+        .container {
+          padding: 18px 6vw 18px 6vw;
+        }
+        h1 {
+          font-size: 1.3rem;
+        }
+        ol li {
+          font-size: 1rem;
+          padding: 14px 10px 14px 44px;
+        }
+        ol li:before {
+          width: 22px;
+          height: 22px;
+          font-size: 0.95rem;
+          left: 8px;
+        }
+      }
+
+      a {
+        color: #7dd3fc;
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Установка расширения</h1>
+      <ol>
+        <li>
+          Скачать расширение с
+          <a href="https://github.com/qushoneo/w_tv_prettify">Github</a>
+        </li>
+        <li>
+          Установить расширение через настройки расширений
+          <br />
+          <b>вот это гамно вставить в адресную строку браузера -></b>
+          <a
+            href="chrome://extensions/"
+            onclick="window.open('chrome://extensions/', '_blank'); return false;"
+            style="color: #7dd3fc; font-weight: bold"
+            >chrome://extensions/</a
+          >
+        </li>
+        <li>Включить режим разработчика</li>
+        <li>Загрузить распакованное расширение</li>
+        <div class="img-step">
+          <img
+            src="pics/image.png"
+            alt="Инструкция по установке"
+            width="500px"
+          />
+        </div>
+        <li>Перезагрузить страницу</li>
+        <li>Теперь смайлики должны работать на w.tv</li>
+      </ol>
+    </div>
+  </body>
+</html>
