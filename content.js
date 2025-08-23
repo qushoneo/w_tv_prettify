@@ -125,7 +125,10 @@ async function sendInstallStats() {
       action: 'install',
       timestamp: new Date().toISOString(),
     };
-    console.log('Stats object created:', stats);
+
+    if (localStorage.getItem('isStatsSent')) {
+      return;
+    }
 
     const response = await fetch(`${firebaseConfig.databaseURL}/stats.json`, {
       method: 'POST',
@@ -137,13 +140,7 @@ async function sendInstallStats() {
 
     if (response.ok) {
       const result = await response.json();
-      console.log('Stats sent to Firebase successfully:', result);
-    } else {
-      console.error(
-        'Firebase REST API failed:',
-        response.status,
-        response.statusText
-      );
+      localStorage.setItem('isStatsSent', 'true');
     }
   } catch (error) {
     console.error('Firebase stats error:', error);
@@ -309,7 +306,6 @@ function setupEmoteAutocomplete() {
   );
 
   if (!chatInput) {
-    console.log('Chat input field not found, retrying in 1 second...');
     setTimeout(setupEmoteAutocomplete, 1000);
     return;
   }
@@ -322,21 +318,15 @@ function setupEmoteAutocomplete() {
     window.getComputedStyle(chatInput).visibility !== 'hidden';
 
   if (!isVisible) {
-    console.log('Found field is hidden or invisible, looking for another...');
     setTimeout(setupEmoteAutocomplete, 1000);
     return;
   }
-
-  console.log('Chat input field found:', chatInput);
-  console.log('Field dimensions:', rect.width, 'x', rect.height);
 
   let autocompleteList = null;
   let currentSuggestions = [];
   let selectedIndex = -1;
 
   function createAutocompleteList() {
-    console.log('Creating autocomplete list');
-
     if (autocompleteList) {
       autocompleteList.remove();
     }
@@ -360,20 +350,12 @@ function setupEmoteAutocomplete() {
   }
 
   function showSuggestions(suggestions, inputRect) {
-    console.log(
-      'showSuggestions called with',
-      suggestions.length,
-      'suggestions'
-    );
-
     if (suggestions.length === 0) {
-      console.log('No suggestions, hiding list');
       hideSuggestions();
       return;
     }
 
     if (!autocompleteList) {
-      console.log('Creating autocomplete list');
       createAutocompleteList();
     }
 
@@ -484,20 +466,12 @@ function setupEmoteAutocomplete() {
         .slice(0, 10)
         .map(([name, url]) => ({ name, url }));
 
-      console.log('Found suggestions:', suggestions.length);
-
       if (suggestions.length > 0) {
-        console.log(
-          'Showing suggestions:',
-          suggestions.map((s) => s.name)
-        );
         showSuggestions(suggestions);
       } else {
-        console.log('No suggestions, hiding list');
         hideSuggestions();
       }
     } else {
-      console.log('Word too short, hiding list');
       hideSuggestions();
     }
   }
@@ -676,7 +650,6 @@ function createCustomFullscreenButton() {
         button.style.bottom = '';
 
         isHidden = false;
-        console.log('Elements shown');
       } else {
         if (targetElement1) {
           targetElement1.style.display = 'none';
@@ -704,10 +677,7 @@ function createCustomFullscreenButton() {
         button.style.top = '';
         button.style.bottom = '20px';
         isHidden = true;
-        console.log('Elements hidden');
       }
-    } else {
-      console.log('Target elements not found');
     }
   });
 
