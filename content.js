@@ -22,13 +22,6 @@ async function loadEmotesFromAPI() {
 
     emotes = { ...emotes, ...parsed };
     console.log('Loaded emotes:', Object.keys(parsed).length);
-
-    const xdEmotes = Object.keys(parsed).filter((name) =>
-      name.toLowerCase().includes('xd')
-    );
-    if (xdEmotes.length > 0) {
-      console.log('XD emotes:', xdEmotes);
-    }
   } catch (err) {
     console.error('Error loading emotes:', err);
   }
@@ -58,11 +51,20 @@ function replaceEmotes(root = document.body) {
 
   let node;
   while ((node = walker.nextNode())) {
+    // Skip if parent already contains img tags (avoid duplicates)
     if (
       node.parentNode &&
       (node.parentNode.tagName === 'SCRIPT' ||
         node.parentNode.tagName === 'STYLE' ||
-        node.parentNode.closest('img'))
+        node.parentNode.closest('img') ||
+        node.parentNode.closest('.username') ||
+        node.parentNode.closest('[data-test-id*="username"]') ||
+        node.parentNode.closest('.nickname') ||
+        node.parentNode.closest('.user-info') ||
+        node.parentNode.closest('[data-state]') ||
+        node.parentNode.closest('[data-grace-area-trigger]') ||
+        node.parentNode.closest('.font-semibold') ||
+        node.parentNode.closest('.truncate'))
     ) {
       continue;
     }
@@ -72,6 +74,7 @@ function replaceEmotes(root = document.body) {
 
     for (const [emoteName, emoteUrl] of Object.entries(emotes)) {
       const regex = createEmoteRegex(emoteName);
+
       if (regex.test(text)) {
         hasEmote = true;
         break;
@@ -381,7 +384,6 @@ function setupEmoteAutocomplete() {
     }
   }
 
-  console.log('Adding event listeners to input field');
   chatInput.addEventListener('input', handleInput);
   chatInput.addEventListener('keydown', handleKeydown);
   chatInput.addEventListener('blur', () => {
