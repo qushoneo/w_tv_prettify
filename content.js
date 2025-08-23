@@ -5,18 +5,138 @@ const API_URL = `https://7tv.io/v3/emote-sets/${SET_ID}`;
 
 let emotes = {};
 
-// Simple statistics - send install data to server
+// Firebase configuration - замените на ваши данные
+const firebaseConfig = {
+  apiKey: 'AIzaSyDm1xFUlI6i1FLTdwguRtqyomMyg2cIcuo',
+  authDomain: 'wtvemojis.firebaseapp.com',
+  databaseURL:
+    'https://wtvemojis-default-rtdb.europe-west1.firebasedatabase.app',
+  projectId: 'wtvemojis',
+  storageBucket: 'wtvemojis.firebasestorage.app',
+  messagingSenderId: '324786416725',
+  appId: '1:324786416725:web:ff564065c92d37e86338dc',
+  measurementId: 'G-0KMRSRQJTX',
+};
+
+// Initialize Firebase
+let db = null;
+let app = null;
+
+async function initializeFirebase() {
+  try {
+    console.log('Starting Firebase initialization...');
+    console.log('Firebase config:', firebaseConfig);
+
+    // Проверяем, не загружен ли уже Firebase
+    if (typeof firebase !== 'undefined') {
+      console.log('Firebase already loaded');
+    } else {
+      console.log('Firebase not loaded, loading scripts...');
+
+      // Загружаем Firebase SDK через обычные скрипты
+      const firebaseScript = document.createElement('script');
+      firebaseScript.src =
+        'https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js';
+      document.head.appendChild(firebaseScript);
+      console.log('Firebase App script added');
+
+      await new Promise((resolve, reject) => {
+        firebaseScript.onload = () => {
+          console.log('Firebase App script loaded successfully');
+          resolve();
+        };
+        firebaseScript.onerror = (error) => {
+          console.error('Firebase App script failed to load:', error);
+          reject(error);
+        };
+      });
+
+      const firebaseDBScript = document.createElement('script');
+      firebaseDBScript.src =
+        'https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js';
+      document.head.appendChild(firebaseDBScript);
+      console.log('Firebase Database script added');
+
+      await new Promise((resolve, reject) => {
+        firebaseDBScript.onload = () => {
+          console.log('Firebase Database script loaded successfully');
+          resolve();
+        };
+        firebaseDBScript.onerror = (error) => {
+          console.error('Firebase Database script failed to load:', error);
+          reject(error);
+        };
+      });
+    }
+
+    // Проверяем, что Firebase доступен
+    if (typeof firebase === 'undefined') {
+      throw new Error('Firebase is not available after loading scripts');
+    }
+
+    console.log('Firebase object available:', firebase);
+    console.log('Initializing Firebase app...');
+
+    // Инициализируем Firebase
+    app = firebase.initializeApp(firebaseConfig);
+    console.log('Firebase app initialized:', app);
+
+    console.log('Getting Firebase database...');
+    db = firebase.database();
+    console.log('Firebase database obtained:', db);
+
+    console.log('Firebase initialized successfully');
+
+    // Тестируем подключение
+    try {
+      const testRef = db.ref('test');
+      await testRef.set({ timestamp: Date.now() });
+      console.log('Firebase connection test successful');
+      await testRef.remove(); // Удаляем тестовые данные
+    } catch (testError) {
+      console.error('Firebase connection test failed:', testError);
+    }
+  } catch (error) {
+    console.error('Firebase initialization error:', error);
+    console.error('Error details:', error.message, error.stack);
+  }
+}
+
 async function sendInstallStats() {
   try {
-    // Get username from page
+    console.log('Starting to send install stats...');
+
     let username = 'anonymous';
-    const usernameElement = document.querySelector(
-      '[data-test-id*="username"], .username, [class*="username"]'
-    );
-    if (usernameElement) {
-      username = usernameElement.textContent.trim();
-    } else if (document.title.includes('w.tv')) {
-      username = 'w.tv-user';
+    let attempts = 0;
+    const maxAttempts = 10;
+
+    while (attempts < maxAttempts) {
+      const usernameElement = document.querySelector(
+        '.font-medium.text-sm.text-\\[var\\(--color-base-foreground-primary\\)\\].truncate'
+      );
+
+      console.log(`Attempt ${attempts + 1}: Found element:`, usernameElement);
+      if (usernameElement) {
+        console.log(`Element text: "${usernameElement.textContent}"`);
+      }
+
+      if (usernameElement && usernameElement.textContent.trim()) {
+        username = usernameElement.textContent.trim();
+        console.log(`Username found on attempt ${attempts + 1}:`, username);
+        break;
+      }
+
+      attempts++;
+      if (attempts < maxAttempts) {
+        console.log(
+          `Username not found, retrying... (${attempts}/${maxAttempts})`
+        );
+        await new Promise((resolve) => setTimeout(resolve, 1000)); // Ждем 1 секунду
+      }
+    }
+
+    if (username === 'anonymous') {
+      console.log('Username not found after all attempts, using anonymous');
     }
 
     const stats = {
@@ -24,24 +144,29 @@ async function sendInstallStats() {
       action: 'install',
       timestamp: new Date().toISOString(),
     };
+    console.log('Stats object created:', stats);
 
-    // Send to server
-    const response = await fetch('http://5.35.126.251/api/stats', {
+    // Send to Firebase via REST API
+    const response = await fetch(`${firebaseConfig.databaseURL}/stats.json`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'User-Agent': '7TV-Smiles-Extension/1.0.0',
       },
       body: JSON.stringify(stats),
     });
 
     if (response.ok) {
-      console.log('Install stats sent successfully');
+      const result = await response.json();
+      console.log('Stats sent to Firebase successfully:', result);
     } else {
-      console.log('Failed to send stats:', response.status);
+      console.error(
+        'Firebase REST API failed:',
+        response.status,
+        response.statusText
+      );
     }
   } catch (error) {
-    console.log('Stats error:', error);
+    console.error('Firebase stats error:', error);
   }
 }
 
@@ -329,7 +454,7 @@ function setupEmoteAutocomplete() {
     const cursorPos = chatInput.selectionStart;
 
     let wordStart = cursorPos;
-    // Look for word start, including colons for emotes like :3
+
     while (wordStart > 0 && /[a-zA-Z0-9:]/.test(value[wordStart - 1])) {
       wordStart--;
     }
@@ -355,7 +480,7 @@ function setupEmoteAutocomplete() {
     const cursorPos = chatInput.selectionStart;
 
     let wordStart = cursorPos;
-    // Look for word start, including colons for emotes like :3
+
     while (wordStart > 0 && /[a-zA-Z0-9:]/.test(value[wordStart - 1])) {
       wordStart--;
     }
@@ -441,12 +566,172 @@ function setupEmoteAutocomplete() {
   });
 }
 
+function createCustomFullscreenButton() {
+  if (document.getElementById('custom-fullscreen-btn')) {
+    return;
+  }
+
+  const button = document.createElement('button');
+  button.id = 'custom-fullscreen-btn';
+  button.textContent = 'Врубить мадарыча побольше';
+  button.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 220px;
+    z-index: 10001;
+    background: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s ease;
+    font-family: Arial, sans-serif;
+  `;
+
+  button.addEventListener('mouseenter', () => {
+    button.style.background = '#357abd';
+    button.style.transform = 'translateY(-1px)';
+    button.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.4)';
+  });
+
+  button.addEventListener('mouseleave', () => {
+    button.style.background = '#4a90e2';
+    button.style.transform = 'translateY(0)';
+    button.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.3)';
+  });
+
+  let isHidden = false;
+  let targetElement1 = null;
+  let targetElement2 = null;
+  let headerElement = null;
+  let sidebarElement = null;
+  let mainElement = null;
+  let chatElement = null;
+  let usernameElement = null;
+
+  button.addEventListener('click', () => {
+    if (!targetElement1) {
+      targetElement1 = document.querySelector(
+        '.max-lg\\:p-4.max-md\\:bg-\\[var\\(--color-bg-info\\)\\].max-md\\:rounded-b-\\[20px\\].max-md\\:gap-1.flex.justify-between.items-center'
+      );
+    }
+
+    if (!targetElement2) {
+      targetElement2 = document.querySelector('.hidden.lg\\:flex.flex-col');
+    }
+
+    if (!headerElement) {
+      headerElement = document.querySelector('header');
+    }
+
+    if (!sidebarElement) {
+      sidebarElement = document.querySelector('.layout-sidebar');
+    }
+
+    if (!mainElement) {
+      mainElement = document.querySelector('main');
+    }
+
+    if (!chatElement) {
+      chatElement = document.querySelector(
+        '.sticky.top-\\[var\\(--header-height\\)\\].w-\\[var\\(--chat-width\\)\\].h-\\[calc\\(100svh-\\(var\\(--header-height\\)\\)\\)\\].hidden.lg\\:flex.shrink-0'
+      );
+    }
+
+    // Ищем элемент с ником пользователя
+    if (!usernameElement) {
+      usernameElement = document.querySelector(
+        '.font-medium.text-sm.text-\\[var\\(--color-base-foreground-primary\\)\\].truncate'
+      );
+    }
+
+    if (
+      targetElement1 ||
+      targetElement2 ||
+      headerElement ||
+      sidebarElement ||
+      mainElement ||
+      chatElement
+    ) {
+      if (isHidden) {
+        if (targetElement1) {
+          targetElement1.style.display = 'flex';
+        }
+        if (targetElement2) {
+          targetElement2.style.display = 'flex';
+          targetElement2.style.flexDirection = 'column';
+        }
+        if (headerElement) {
+          headerElement.style.display = '';
+        }
+        if (sidebarElement) {
+          sidebarElement.style.display = 'block';
+        }
+        if (mainElement) {
+          mainElement.style.margin = '';
+          mainElement.style.padding = '';
+        }
+        if (chatElement) {
+          chatElement.style.top = '';
+        }
+        // Восстанавливаем CSS переменную
+        document.documentElement.style.setProperty('--chat-width', '');
+        button.textContent = 'Врубить мадарыча поменьше';
+        button.style.top = '20px';
+        button.style.right = '220px';
+        button.style.bottom = '';
+
+        isHidden = false;
+        console.log('Elements shown');
+      } else {
+        if (targetElement1) {
+          targetElement1.style.display = 'none';
+        }
+        if (targetElement2) {
+          targetElement2.style.display = 'none';
+        }
+        if (headerElement) {
+          headerElement.style.display = 'none';
+        }
+        if (sidebarElement) {
+          sidebarElement.style.display = 'none';
+        }
+        if (mainElement) {
+          mainElement.style.margin = '0';
+          mainElement.style.padding = '0';
+        }
+        if (chatElement) {
+          chatElement.style.top = '0';
+        }
+        // Устанавливаем минимальную ширину через CSS переменную
+        document.documentElement.style.setProperty('--chat-width', '280px');
+        button.style.right = '20px';
+        button.textContent = 'Врубить мадарыча поменьше';
+        button.style.top = '';
+        button.style.bottom = '20px';
+        isHidden = true;
+        console.log('Elements hidden');
+      }
+    } else {
+      console.log('Target elements not found');
+    }
+  });
+
+  document.body.appendChild(button);
+}
+
 loadEmotesFromAPI().then(() => {
   replaceEmotes();
   observer.observe(document.body, { childList: true, subtree: true });
 
   setupEmoteAutocomplete();
 
-  // Send install statistics
+  createCustomFullscreenButton();
+
+  // Отправляем статистику
   sendInstallStats();
 });
