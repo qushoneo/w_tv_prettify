@@ -180,7 +180,7 @@ function createEmoteRegex(emoteName) {
     return new RegExp(`(?<!\\S)${escaped}(?!\\S)`, 'g');
   }
 
-  return new RegExp(`\\b${escaped}\\b`, 'g');
+  return new RegExp(`(?<!\\S)${escaped}(?!\\S)`, 'g');
 }
 
 function replaceEmotes(root = document.body) {
@@ -428,7 +428,7 @@ function setupEmoteAutocomplete() {
 
     let wordStart = cursorPos;
 
-    while (wordStart > 0 && /[a-zA-Z0-9:]/.test(value[wordStart - 1])) {
+    while (wordStart > 0 && /[\w\u0400-\u04FF:]/.test(value[wordStart - 1])) {
       wordStart--;
     }
 
@@ -454,7 +454,7 @@ function setupEmoteAutocomplete() {
 
     let wordStart = cursorPos;
 
-    while (wordStart > 0 && /[a-zA-Z0-9:]/.test(value[wordStart - 1])) {
+    while (wordStart > 0 && /[\w\u0400-\u04FF:]/.test(value[wordStart - 1])) {
       wordStart--;
     }
 
