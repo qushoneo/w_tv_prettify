@@ -511,6 +511,16 @@ function setupEmoteAutocomplete() {
       case 'Escape':
         hideSuggestions();
         break;
+
+      case 'Enter':
+        if (selectedIndex >= 0 && currentSuggestions[selectedIndex]) {
+          event.preventDefault();
+          insertEmote(currentSuggestions[selectedIndex].name);
+          hideSuggestions();
+        } else {
+          hideSuggestions();
+        }
+        break;
     }
   }
 
