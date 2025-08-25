@@ -817,7 +817,7 @@ function createCustomFullscreenButton() {
 
   const button = document.createElement('button');
   button.id = 'custom-fullscreen-btn';
-  button.textContent = 'Врубить мадарыча побольше';
+  button.textContent = 'Режим кинотеатра';
   button.style.cssText = `
     position: fixed;
     top: 20px;
@@ -923,7 +923,8 @@ function createCustomFullscreenButton() {
         }
 
         document.documentElement.style.setProperty('--chat-width', '');
-        button.textContent = 'Врубить мадарыча поменьше';
+        button.textContent = 'Режим кинотеатра';
+        button.style.opacity = '0.5';
         button.style.top = '20px';
         button.style.right = '220px';
         button.style.bottom = '';
@@ -952,7 +953,8 @@ function createCustomFullscreenButton() {
 
         document.documentElement.style.setProperty('--chat-width', '280px');
         button.style.right = '20px';
-        button.textContent = 'Врубить мадарыча поменьше';
+        button.textContent = 'Режим кинотеатра';
+        button.style.opacity = '0.5';
         button.style.top = '';
         button.style.bottom = '20px';
         isHidden = true;
