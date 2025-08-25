@@ -557,6 +557,7 @@ const observer = new MutationObserver((muts) => {
   });
 });
 
+// я знаю что это хуево =)) пока так
 var firebaseConfig = {
   apiKey: 'AIzaSyDm1xFUlI6i1FLTdwguRtqyomMyg2cIcuo',
   authDomain: 'wtvemojis.firebaseapp.com',
@@ -965,7 +966,6 @@ function createCustomFullscreenButton() {
   document.body.appendChild(button);
 }
 
-// Добавляем функцию для отладки поиска никнейма
 window.debugFindNickname = function () {
   console.log('=== Отладка поиска никнейма ===');
 
