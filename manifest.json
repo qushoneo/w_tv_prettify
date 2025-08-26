@@ -6,15 +6,15 @@
   "icons": {
     "128": "icon.png"
   },
-  "permissions": ["activeTab"],
   "host_permissions": [
     "https://api.twitchemotes.com/*",
-    "https://7tv.app/*",
+    "https://7tv.io/*",
     "https://cdn.7tv.app/*",
     "https://static-cdn.jtvnw.net/*",
     "https://cdn.betterttv.net/*",
     "https://cdn.frankerfacez.com/*",
-    "http://5.35.126.251/*"
+    "https://www.gstatic.com/*",
+    "https://wtvemojis-default-rtdb.europe-west1.firebasedatabase.app/*"
   ],
   "content_scripts": [
     {
@@ -25,7 +25,7 @@
   "web_accessible_resources": [
     {
       "resources": ["twitch-emoticons.js"],
-      "matches": ["<all_urls>"]
+      "matches": ["*://*.w.tv/*", "*://w.tv/*"]
     }
   ]
 }
