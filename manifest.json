@@ -6,16 +6,7 @@
   "icons": {
     "128": "icon.png"
   },
-  "host_permissions": [
-    "https://api.twitchemotes.com/*",
-    "https://7tv.io/*",
-    "https://cdn.7tv.app/*",
-    "https://static-cdn.jtvnw.net/*",
-    "https://cdn.betterttv.net/*",
-    "https://cdn.frankerfacez.com/*",
-    "https://www.gstatic.com/*",
-    "https://wtvemojis-default-rtdb.europe-west1.firebasedatabase.app/*"
-  ],
+  "host_permissions": ["https://7tv.io/*", "https://cdn.7tv.app/*"],
   "content_scripts": [
     {
       "matches": ["*://*.w.tv/*", "*://w.tv/*"],
